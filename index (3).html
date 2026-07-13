@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS AI — Design your life on paper. Build it for real.</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+<!-- ===================== LOADER ===================== -->
+<div class="loader-screen" id="loaderScreen">
+  <div class="loader-mark">L</div>
+  <div class="lt">LOADING YOUR LIFEOS…</div>
+</div>
+
+<!-- ===================== AUTH ===================== -->
+<div class="auth-shell hidden" id="authShell">
+  <div class="auth-visual">
+    <div class="brand"><div class="mark">L</div><span>LifeOS AI</span></div>
+    <div class="pitch">
+      <h1 id="authPitchTitle">Design the life you want on paper. Then go build it for real.</h1>
+      <p>One command center for your academics, career, finances, investments, habits and health — scored, tracked, and coached by AI, built for the Kenyan hustle.</p>
+    </div>
+    <svg class="orbit-deco" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="300" cy="250" r="90" fill="none" stroke="rgba(201,169,97,0.25)" stroke-width="1"/>
+      <circle cx="300" cy="250" r="150" fill="none" stroke="rgba(110,140,255,0.18)" stroke-width="1"/>
+      <circle cx="300" cy="250" r="210" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <circle cx="300" cy="60" r="4" fill="#C9A961"/>
+      <circle cx="490" cy="250" r="3" fill="#6E8CFF"/>
+      <circle cx="150" cy="380" r="3" fill="#2FBE85"/>
+      <circle cx="470" cy="120" r="2.5" fill="#E5677E"/>
+    </svg>
+    <div class="foot">LIFEOS AI © 2026 — YOUR PERSONAL OPERATING SYSTEM</div>
+  </div>
+  <div class="auth-panel">
+    <div class="auth-box">
+      <!-- LOGIN -->
+      <div id="loginView">
+        <h2>Welcome back</h2>
+        <div class="sub">Sign in to pick up where you left off.</div>
+        <form id="loginForm">
+          <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com" required></div>
+          <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required></div>
+          <div id="loginError" class="hidden" style="color:var(--danger);font-size:12.5px;margin-bottom:12px;"></div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+        </form>
+        <div class="auth-switch">New here? <a id="goSignup">Create an account</a></div>
+      </div>
+      <!-- SIGNUP -->
+      <div id="signupView" class="hidden">
+        <h2>Build your LifeOS</h2>
+        <div class="sub">Takes less than a minute to get started.</div>
+        <form id="signupForm">
+          <div class="field"><label>Full name</label><input type="text" id="signupName" placeholder="Jane Wanjiru" required></div>
+          <div class="field"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com" required></div>
+          <div class="field"><label>Password</label><input type="password" id="signupPassword" placeholder="Minimum 6 characters" minlength="6" required></div>
+          <div id="signupError" class="hidden" style="color:var(--danger);font-size:12.5px;margin-bottom:12px;"></div>
+          <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+        <div class="auth-switch">Already have an account? <a id="goLogin">Sign in</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div class="app-shell hidden" id="appShell">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark">L</div><span>LifeOS AI</span></div>
+
+    <nav class="nav-group">
+      <span class="eyebrow">Overview</span>
+      <a class="nav-link" data-page="dashboard"><i class="fa-solid fa-chart-simple"></i>Dashboard</a>
+      <a class="nav-link" data-page="profile"><i class="fa-solid fa-user"></i>Profile</a>
+    </nav>
+    <nav class="nav-group">
+      <span class="eyebrow">Growth</span>
+      <a class="nav-link" data-page="academics"><i class="fa-solid fa-graduation-cap"></i>Academics</a>
+      <a class="nav-link" data-page="career"><i class="fa-solid fa-briefcase"></i>Career</a>
+      <a class="nav-link" data-page="habits"><i class="fa-solid fa-repeat"></i>Habits</a>
+      <a class="nav-link" data-page="health"><i class="fa-solid fa-heart-pulse"></i>Health</a>
+    </nav>
+    <nav class="nav-group">
+      <span class="eyebrow">Money</span>
+      <a class="nav-link" data-page="finance"><i class="fa-solid fa-sack-dollar"></i>Finance</a>
+      <a class="nav-link" data-page="investments"><i class="fa-solid fa-coins"></i>Investments</a>
+      <a class="nav-link" data-page="loans"><i class="fa-solid fa-file-invoice-dollar"></i>Loans</a>
+      <a class="nav-link" data-page="fi"><i class="fa-solid fa-fire"></i>FI Tracker</a>
+    </nav>
+    <nav class="nav-group">
+      <span class="eyebrow">Vision</span>
+      <a class="nav-link" data-page="goals"><i class="fa-solid fa-bullseye"></i>Goals</a>
+      <a class="nav-link" data-page="future"><i class="fa-solid fa-road"></i>Future Plans</a>
+      <a class="nav-link" data-page="visionboard"><i class="fa-solid fa-image"></i>Vision Board</a>
+      <a class="nav-link" data-page="documents"><i class="fa-solid fa-folder-open"></i>Documents</a>
+      <a class="nav-link" data-page="review"><i class="fa-solid fa-wand-magic-sparkles"></i>Weekly Review</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="user-chip" id="userChipBtn" style="cursor:pointer;">
+        <div class="avatar" id="sidebarAvatar">?</div>
+        <div class="who">
+          <div class="name" id="sidebarName">—</div>
+          <div class="level" id="sidebarLevel">Intern</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="breadcrumb" id="pageBreadcrumb">LIFEOS / DASHBOARD</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Quick search…" id="quickSearch"></div>
+        <button class="icon-btn" id="notifBtn" style="position:relative;"><i class="fa-solid fa-bell"></i><span class="badge-dot hidden" id="notifDot"></span></button>
+        <div class="theme-toggle" id="themeToggle"><div class="knob"><i class="fa-solid fa-moon"></i></div></div>
+        <button class="icon-btn" id="logoutBtn" title="Sign out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="content" id="pageContent">
+      <!-- injected per-page by app.js -->
+    </main>
+  </div>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav hidden" id="mobileNav">
+  <a data-page="dashboard"><i class="fa-solid fa-chart-simple"></i>Home</a>
+  <a data-page="finance"><i class="fa-solid fa-sack-dollar"></i>Finance</a>
+  <a data-page="career"><i class="fa-solid fa-briefcase"></i>Career</a>
+  <a data-page="goals"><i class="fa-solid fa-bullseye"></i>Goals</a>
+  <a data-page="profile"><i class="fa-solid fa-user"></i>Profile</a>
+</nav>
+
+<!-- Modal root -->
+<div id="modalRoot"></div>
+<!-- Toast root -->
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="store.js"></script>
+<script src="supabase-client.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
