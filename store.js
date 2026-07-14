@@ -254,8 +254,8 @@ const CAREER_ROADMAPS = {
   },
   'Financial Analyst': {
     icon:'fa-file-invoice-dollar', color:'emerald',
-    steps:['Build strong Excel & financial modeling skills','Pass CFA Level 1','Join a bank, PE fund or corporate FP&A team','Progress to senior analyst','Move into portfolio management or corp finance leadership'],
-    certs:['CFA','CIFA','FMVA'],
+    steps:['Build strong Excel & financial modeling skills','Pass CIFA and CPA ','Join a bank, PE fund or corporate FP&A team','Progress to senior analyst','Move into portfolio management or corp finance leadership'],
+    certs:['CPA','CIFA','FMVA'],
     salaryPath:'Analyst → Senior Analyst → Associate → VP → Director'
   },
   'Risk Manager': {
