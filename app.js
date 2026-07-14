@@ -887,20 +887,25 @@ function renderFI(){
   <div class="module-hero theme-investment">
     <div><h2><i class="fa-solid fa-fire hero-icon" style="margin-right:10px;"></i>Financial Independence</h2>
     <p>Your number, your timeline, based on the 4% rule.</p></div>
-    ${ringSVG(fi.pct, 96, 8, 'var(--gold)', false, fi.pct.toFixed(0)+'%', '')}
+    ${fi.hasData ? ringSVG(fi.pct, 96, 8, 'var(--gold)', false, fi.pct.toFixed(0)+'%', '') : ''}
   </div>
+  ${!fi.hasData ? `
+  <div class="glass card" style="text-align:center; padding:32px 24px; margin-bottom:22px;">
+    <i class="fa-solid fa-circle-info" style="font-size:22px; color:var(--gold); margin-bottom:10px; display:block;"></i>
+    <p style="color:var(--text-secondary); max-width:420px; margin:0 auto;">Add your monthly expenses on the <strong>Finance</strong> page, or set a target below, to calculate your FI number.</p>
+  </div>` : `
   <div class="grid grid-4" style="margin-bottom:22px;">
     <div class="glass card"><div class="stat-num">${fmtMoney(fi.fiNumber)}</div><div class="stat-label">FI Number</div></div>
     <div class="glass card"><div class="stat-num">${fmtMoney(fi.currentPortfolio)}</div><div class="stat-label">Current Portfolio</div></div>
     <div class="glass card"><div class="stat-num">${fmtMoney(fi.monthlyContribution)}</div><div class="stat-label">Monthly Contribution</div></div>
     <div class="glass card"><div class="stat-num">${fi.yearsToFI===null?'—':fi.yearsToFI}</div><div class="stat-label">Years to FI</div></div>
-  </div>
+  </div>`}
   <div class="glass card">
     <div class="card-title"><i class="fa-solid fa-gear"></i>Target Monthly Expense at FI</div>
     <div class="field" style="margin-top:12px; max-width:320px;"><label>KES / month</label>
       <input type="number" id="fiTarget" value="${state.fiTargetMonthlyExpense||0}" placeholder="Defaults to current expenses"></div>
     <button class="btn btn-primary btn-sm" id="saveFITargetBtn">Save</button>
-    ${progressBar(fi.pct,'var(--gold)')}
+    ${fi.hasData ? progressBar(fi.pct,'var(--gold)') : ''}
   </div>`;
 }
 
