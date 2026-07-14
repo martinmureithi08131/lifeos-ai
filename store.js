@@ -8,7 +8,7 @@ const LS_KEY = 'lifeos_ai_v1';
 
 const QUOTES = [
   "Discipline is choosing between what you want now and what you want most.",
-  "Compound interest is the eighth wonder of the world — he who understands it, earns it.",
+  "Compound interest is the eighth wonder of the world he who understands it, earns it.",
   "A goal without a deadline is just a wish.",
   "Your net worth grows one disciplined decision at a time.",
   "The best time to invest was ten years ago. The second best time is today.",
@@ -177,20 +177,21 @@ function corporateReadinessScore(){
 /* ---------------- Financial Independence (FI) Tracker ---------------- */
 function fiTracker(){
   const fs = financeSummary();
-  const monthlyExpenseTarget = state.fiTargetMonthlyExpense || fs.expenses || 1;
+  const monthlyExpenseTarget = state.fiTargetMonthlyExpense || fs.expenses || 0;
+  const hasData = monthlyExpenseTarget > 0;
   const fiNumber = monthlyExpenseTarget * 12 * 25; // 4% rule
   const currentPortfolio = (state.investments||[]).reduce((a,i)=>a+(Number(i.currentValue)||0),0);
   const pct = fiNumber>0 ? clamp((currentPortfolio/fiNumber)*100,0,100) : 0;
   const monthlyContribution = fs.investBudget;
   const annualReturn = 0.10;
   let years = 0, projected = currentPortfolio;
-  if(monthlyContribution>0){
+  if(monthlyContribution>0 && fiNumber>0){
     while(projected < fiNumber && years < 60){
       projected = projected*(1+annualReturn) + monthlyContribution*12;
       years++;
     }
   } else { years = null; }
-  return { fiNumber, currentPortfolio, pct, monthlyContribution, yearsToFI: years };
+  return { fiNumber, currentPortfolio, pct, monthlyContribution, yearsToFI: years, hasData };
 }
 
 /* ---------------- Emergency Fund ---------------- */
