@@ -266,8 +266,8 @@ const CAREER_ROADMAPS = {
   },
   'Investment Analyst': {
     icon:'fa-coins', color:'gold',
-    steps:['Master valuation, DCF and portfolio theory','Pass CFA levels','Join asset manager, bank or fund','Build sector expertise','Progress to Portfolio Manager'],
-    certs:['CFA','CIFA','CAIA'],
+    steps:['Master valuation, DCF and portfolio theory','Pass CIFA levels','Join asset manager, bank or fund','Build sector expertise','Progress to Portfolio Manager'],
+    certs:['CPA','CIFA','CAIA'],
     salaryPath:'Analyst → Senior Analyst → Portfolio Manager → CIO'
   },
   'CFO': {
