@@ -6,8 +6,8 @@
    exactly as before (localStorage, single browser).
    ========================================================================== */
 
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';        // e.g. https://abcxyz.supabase.co
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Project Settings -> API -> anon public key
+const SUPABASE_URL = 'https://dldftmswqzhmaswfghxj.supabase.co';        // e.g. https://abcxyz.supabase.co
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZGZ0bXN3cXpobWFzd2ZnaHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NjU3NzIsImV4cCI6MjA5OTU0MTc3Mn0.97UKqF1S5WGFNKjFoXywF3570kOhlAkFUKoNs_BOreE'; // Project Settings -> API -> anon public key
 
 const SUPABASE_ENABLED = SUPABASE_URL.startsWith('https://') && !SUPABASE_ANON_KEY.startsWith('YOUR_');
 
