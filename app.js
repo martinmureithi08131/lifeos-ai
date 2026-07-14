@@ -17,19 +17,13 @@ async function boot(){
     document.getElementById('loaderScreen').style.opacity = '0';
     document.getElementById('loaderScreen').style.visibility = 'hidden';
 
+    // Always require a fresh sign-in on page load/refresh — no persisted session.
     if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
-      const session = await sbGetSession();
-      if(session){
-        window.__sbUserId = session.user.id;
-        const cloudState = await sbLoadState(session.user.id);
-        if(cloudState) state = Object.assign(defaultState(), cloudState);
-        state.auth = { loggedIn:true, currentUserEmail: session.user.email };
-        save();
-        enterApp();
-        return;
-      }
+      await sbSignOut();
+      window.__sbUserId = null;
     }
-    if(state.auth.loggedIn){ enterApp(); } else { showAuth('login'); }
+    logout(); // clears local state.auth
+    showAuth('login');
   }, 550);
 }
 
@@ -1268,7 +1262,7 @@ function openAddLoanModal(){
 }
 function openAddGoalModal(){
   openModal('Add Goal', `
-    <div class="field"><label>Title</label><input type="text" id="mTitle" placeholder="e.g. Make it happen"></div>
+    <div class="field"><label>Title</label><input type="text" id="mTitle" placeholder="e.g. Pass EY assessment"></div>
     <div class="field"><label>Category</label><select id="mCategory"><option>Career</option><option>Finance</option><option>Health</option><option>Personal</option></select></div>
     <div class="field"><label>Deadline</label><input type="date" id="mDeadline"></div>
     <div class="field"><label>Completion (%)</label><input type="number" id="mCompletion" value="0" min="0" max="100"></div>
