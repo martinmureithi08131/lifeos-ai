@@ -277,31 +277,28 @@ function confirmDelete(label, onYes){
    DASHBOARD
    ========================================================================== */
 function renderDashboard(){
-  const overall = overallLifeScore();
-  const modules = [
-    { key:'academics', label:'Academics', score:scoreAcademic(), color:'var(--blue)', angle:270 },
-    { key:'career', label:'Career', score:scoreCareer(), color:'var(--navy-accent)', angle:310 },
-    { key:'finance', label:'Finance', score:scoreFinance(), color:'var(--emerald)', angle:350 },
-    { key:'investment', label:'Invest', score:scoreInvestment(), color:'var(--gold)', angle:30 },
-    { key:'savings', label:'Savings', score:scoreSavings(), color:'var(--emerald)', angle:70 },
-    { key:'habits', label:'Habits', score:scoreHabits(), color:'var(--rose)', angle:110 },
-    { key:'health', label:'Health', score:scoreHealth(), color:'var(--amber)', angle:150 },
-  ];
   const quote = QUOTES[quoteIdx];
   const fs = financeSummary();
   const ef = emergencyFundStatus();
-  const goalsPct = goalCompletionPct();
+  const p = state.profile;
 
-  const nodesHtml = modules.map(m=>{
-    const rad = (m.angle * Math.PI)/180;
-    const R = 38;
-    const x = 50 + R*Math.cos(rad);
-    const y = 50 + R*Math.sin(rad)*0.72;
-    return `<div class="node" style="left:${x}%; top:${y}%;">
-      <div class="dot" style="border-color:${m.color};color:${m.color};">${m.score}</div>
-      <div class="lbl">${m.label}</div>
-    </div>`;
-  }).join('');
+  const hasAnyData = !!(p.fullName || p.occupation || (state.goals||[]).length || (state.habits||[]).length ||
+    fs.income>0 || fs.expenses>0 || (state.investments||[]).length || (state.career.applications||[]).length ||
+    state.academics.cgpa || state.health.exercise || state.health.sleepHours);
+
+  if(!hasAnyData){
+    return `
+      <div class="quote-banner glass" style="margin-bottom:22px;">
+        <i class="fa-solid fa-quote-left"></i>
+        <div><p>"${escapeHtml(quote)}"</p><span>Today's LifeOS reflection</span></div>
+      </div>
+      <div class="glass card" style="text-align:center; padding:48px 24px;">
+        <i class="fa-solid fa-seedling" style="font-size:32px; color:var(--gold); margin-bottom:14px; display:block;"></i>
+        <h3 style="font-family:var(--font-display); margin-bottom:8px;">Your LifeOS is empty so far</h3>
+        <p style="color:var(--text-secondary); max-width:440px; margin:0 auto 18px;">Start with your Profile, then add a goal or two, log your finances, or track a habit — this page will turn into a running summary of your life as you go.</p>
+        <button class="btn btn-primary" onclick="go('profile')"><i class="fa-solid fa-user"></i>Set up your profile</button>
+      </div>`;
+  }
 
   return `
     <div class="quote-banner glass" style="margin-bottom:22px;">
@@ -309,11 +306,10 @@ function renderDashboard(){
       <div><p>"${escapeHtml(quote)}"</p><span>Today's LifeOS reflection</span></div>
     </div>
 
-    <div class="constellation glass card" style="margin-bottom:22px;">
-      ${nodesHtml}
-      <div class="node center" style="left:50%; top:50%;">
-        <div class="dot" style="border-color:var(--gold); color:var(--gold);">${overall}</div>
-        <div class="lbl">Overall Life Score</div>
+    <div class="glass card" style="margin-bottom:22px;">
+      <div class="card-title"><i class="fa-solid fa-scroll"></i>Your Life at a Glance</div>
+      <div style="margin-top:14px; display:flex; flex-direction:column; gap:12px; font-size:14.5px; line-height:1.7; color:var(--text-secondary);">
+        ${buildLifeSummary().map(line=>`<p style="margin:0;">${line}</p>`).join('')}
       </div>
     </div>
 
@@ -321,38 +317,118 @@ function renderDashboard(){
       <div class="glass card">
         <div class="card-title"><i class="fa-solid fa-sack-dollar"></i>Monthly Net</div>
         <div class="stat-num">${fmtMoney(fs.net)}</div>
-        <div class="trend ${fs.net>=0?'up':'down'}"><i class="fa-solid fa-arrow-${fs.net>=0?'up':'down'}"></i>${fs.savingsRatio.toFixed(0)}% savings rate</div>
+        <div class="trend ${fs.net>=0?'up':'down'}"><i class="fa-solid fa-arrow-${fs.net>=0?'up':'down'}"></i>${fs.income>0? fs.savingsRatio.toFixed(0)+'% of income saved' : 'Add your income to see this'}</div>
       </div>
       <div class="glass card">
         <div class="card-title"><i class="fa-solid fa-shield-halved"></i>Emergency Fund</div>
-        <div class="stat-num">${ef.pct.toFixed(0)}%</div>
-        ${progressBar(ef.pct,'var(--emerald)')}
+        <div class="stat-num">${fs.expenses>0 ? (state.emergencyFundCurrent/Math.max(fs.expenses,1)).toFixed(1)+' mo' : '—'}</div>
+        <div style="font-size:12px; color:var(--text-tertiary); margin-top:4px;">of expenses saved, target ${state.emergencyFundTarget||6} mo</div>
       </div>
       <div class="glass card">
-        <div class="card-title"><i class="fa-solid fa-bullseye"></i>Goals Progress</div>
-        <div class="stat-num">${goalsPct}%</div>
-        ${progressBar(goalsPct,'var(--gold)')}
+        <div class="card-title"><i class="fa-solid fa-bullseye"></i>Goals</div>
+        <div class="stat-num">${(state.goals||[]).filter(g=>Number(g.completion)>=100).length} / ${(state.goals||[]).length}</div>
+        <div style="font-size:12px; color:var(--text-tertiary); margin-top:4px;">completed</div>
       </div>
       <div class="glass card">
-        <div class="card-title"><i class="fa-solid fa-medal"></i>Corporate Readiness</div>
-        <div class="stat-num">${corporateReadinessScore()}</div>
-        ${progressBar(corporateReadinessScore(),'var(--navy-accent)')}
+        <div class="card-title"><i class="fa-solid fa-briefcase"></i>Career Activity</div>
+        <div class="stat-num">${(state.career.applications||[]).length}</div>
+        <div style="font-size:12px; color:var(--text-tertiary); margin-top:4px;">applications · ${(state.career.interviews||[]).length} interviews</div>
       </div>
     </div>
 
-    <div class="grid grid-a2b1">
-      <div class="glass card">
-        <div class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i>This Week's AI Priorities</div>
-        <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
-          ${buildAIPriorities().map(p=>`<div class="ai-note"><i class="fa-solid fa-star"></i><span>${escapeHtml(p)}</span></div>`).join('')}
-        </div>
-      </div>
-      <div class="glass card">
-        <div class="card-title"><i class="fa-solid fa-chart-pie"></i>Life Wheel</div>
-        ${lifeWheelBars()}
+    <div class="glass card">
+      <div class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i>This Week's Priorities</div>
+      <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+        ${buildAIPriorities().map(p=>`<div class="ai-note"><i class="fa-solid fa-star"></i><span>${escapeHtml(p)}</span></div>`).join('')}
       </div>
     </div>
   `;
+}
+
+function buildLifeSummary(){
+  const p = state.profile, a = state.academics, c = state.career, fs = financeSummary();
+  const goals = state.goals||[], habits = state.habits||[], invs = state.investments||[], loans = state.loans||[];
+  const lines = [];
+
+  // Who you are
+  let intro = `You're`;
+  if(p.fullName) intro += ` ${escapeHtml(p.fullName)},`;
+  if(p.age) intro += ` ${p.age} years old,`;
+  if(p.occupation) intro += ` working as ${escapeHtml(p.occupation)}`;
+  else if(p.university) intro += ` studying at ${escapeHtml(p.university)}`;
+  if(p.city) intro += ` based in ${escapeHtml(p.city)}`;
+  intro += '.';
+  if(intro !== 'You\'re.') lines.push(intro);
+
+  // Academics
+  if(a.cgpa || a.studyHours || a.booksRead){
+    let s = '';
+    if(a.cgpa) s += `Your CGPA is currently ${escapeHtml(a.cgpa)}. `;
+    if(a.studyHours) s += `You're studying about ${a.studyHours} hours a week`;
+    if(a.streak) s += ` with a ${a.streak}-day streak`;
+    if(s) s += '. ';
+    if(a.booksRead) s += `You've read ${a.booksRead} book${a.booksRead==1?'':'s'} so far.`;
+    if(s) lines.push(s.trim());
+  }
+
+  // Career
+  if((c.applications||[]).length || (c.interviews||[]).length || (c.networkContacts||0)>0){
+    let s = '';
+    if((c.applications||[]).length) s += `You've applied to ${c.applications.length} role${c.applications.length==1?'':'s'}`;
+    if((c.interviews||[]).length) s += `${s?' and completed ':'You\'ve completed '}${c.interviews.length} interview${c.interviews.length==1?'':'s'}`;
+    if(s) s += '. ';
+    if(c.networkContacts) s += `Your professional network sits at ${c.networkContacts} contacts.`;
+    if(s) lines.push(s.trim());
+  }
+
+  // Finance
+  if(fs.income>0 || fs.expenses>0){
+    let s = `You bring in ${fmtMoney(fs.income)} a month against ${fmtMoney(fs.expenses)} in expenses, `;
+    s += fs.net>=0 ? `leaving you ${fmtMoney(fs.net)} ahead each month.` : `putting you ${fmtMoney(Math.abs(fs.net))} short each month.`;
+    lines.push(s);
+    const ef = emergencyFundStatus();
+    if(ef.target>0){
+      const months = (state.emergencyFundCurrent/Math.max(fs.expenses,1));
+      lines.push(`Your emergency fund covers about ${months.toFixed(1)} month${months==1?'':'s'} of expenses, against a target of ${state.emergencyFundTarget||6}.`);
+    }
+  }
+  if(loans.length){
+    const totalBal = loans.reduce((a,l)=>a+(Number(l.balance)||0),0);
+    lines.push(`You're carrying ${fmtMoney(totalBal)} in outstanding loans across ${loans.length} lender${loans.length==1?'':'s'}.`);
+  }
+  if(invs.length){
+    const totalVal = invs.reduce((a,i)=>a+(Number(i.currentValue)||0),0);
+    lines.push(`Your investment portfolio is worth ${fmtMoney(totalVal)} across ${invs.length} holding${invs.length==1?'':'s'}.`);
+  }
+
+  // Goals
+  if(goals.length){
+    const done = goals.filter(g=>Number(g.completion)>=100).length;
+    const inProgress = goals.filter(g=>Number(g.completion)<100).slice(0,3).map(g=>escapeHtml(g.title));
+    let s = `Of your ${goals.length} goal${goals.length==1?'':'s'}, ${done} ${done==1?'is':'are'} complete.`;
+    if(inProgress.length) s += ` Still in progress: ${inProgress.join(', ')}.`;
+    lines.push(s);
+  }
+
+  // Habits
+  if(habits.length){
+    const names = habits.map(h=>`${escapeHtml(h.name)} (${h.consistency||0}%)`).join(', ');
+    lines.push(`You're tracking ${habits.length} habit${habits.length==1?'':'s'}: ${names}.`);
+  }
+
+  // Health
+  if(state.health.exercise || state.health.sleepHours || state.health.waterIntake){
+    let s = 'On health: ';
+    const bits = [];
+    if(state.health.exercise) bits.push(`${state.health.exercise} exercise session${state.health.exercise==1?'':'s'} a week`);
+    if(state.health.sleepHours) bits.push(`${state.health.sleepHours} hours of sleep a night`);
+    if(state.health.waterIntake) bits.push(`${state.health.waterIntake} glasses of water a day`);
+    s += bits.join(', ') + '.';
+    lines.push(s);
+  }
+
+  if(!lines.length) lines.push('Fill in a few pages and this will turn into a running summary of your life.');
+  return lines;
 }
 
 function lifeWheelBars(){
