@@ -1258,7 +1258,7 @@ function openAddLoanModal(){
 }
 function openAddGoalModal(){
   openModal('Add Goal', `
-    <div class="field"><label>Title</label><input type="text" id="mTitle" placeholder="e.g. Pass EY assessment"></div>
+    <div class="field"><label>Title</label><input type="text" id="mTitle" placeholder="e.g. Buy a car"></div>
     <div class="field"><label>Category</label><select id="mCategory"><option>Career</option><option>Finance</option><option>Health</option><option>Personal</option></select></div>
     <div class="field"><label>Deadline</label><input type="date" id="mDeadline"></div>
     <div class="field"><label>Completion (%)</label><input type="number" id="mCompletion" value="0" min="0" max="100"></div>
