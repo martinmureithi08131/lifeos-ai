@@ -1,12 +1,8 @@
-/* ==========================================================================
-   LifeOS AI — app.js
-   Router, rendering, and interaction layer. Reads/writes `state` from store.js.
-   ========================================================================== */
 
 let currentPage = 'dashboard';
 let quoteIdx = Math.floor(Math.random()*QUOTES.length);
 
-/* ---------------- Boot ---------------- */
+
 window.addEventListener('DOMContentLoaded', boot);
 
 async function boot(){
@@ -17,7 +13,7 @@ async function boot(){
     document.getElementById('loaderScreen').style.opacity = '0';
     document.getElementById('loaderScreen').style.visibility = 'hidden';
 
-    // Always require a fresh sign-in on page load/refresh — no persisted session.
+
     if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
       await sbSignOut();
       window.__sbUserId = null;
@@ -188,7 +184,7 @@ function render(){
   wirePageEvents(currentPage);
 }
 
-/* ---------------- Small UI helpers ---------------- */
+
 function toast(msg, kind){
   kind = kind || 'info';
   const colors = { success:'var(--emerald)', info:'var(--navy-accent)', danger:'var(--danger)', warn:'var(--amber)' };
