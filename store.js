@@ -1,8 +1,4 @@
-/* ==========================================================================
-   LifeOS AI — store.js
-   Central state, localStorage persistence, and all calculation logic.
-   Everything here is framework-free vanilla JS.
-   ========================================================================== */
+
 
 const LS_KEY = 'lifeos_ai_v1';
 
