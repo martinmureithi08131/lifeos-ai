@@ -298,7 +298,7 @@ function renderDashboard(){
     </div>
 
     <div class="glass card" style="margin-bottom:22px;">
-      <div class="card-title"><i class="fa-solid fa-scroll"></i>Track your Every Step With LifeTrack</div>
+      <div class="card-title"><i class="fa-solid fa-scroll"></i>Track your Every Step With LifeOS</div>
       <div style="margin-top:14px; display:flex; flex-direction:column; gap:12px; font-size:14.5px; line-height:1.7; color:var(--text-secondary);">
         ${buildLifeSummary().map(line=>`<p style="margin:0;">${line}</p>`).join('')}
       </div>
