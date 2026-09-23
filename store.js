@@ -1,6 +1,6 @@
 
 
-const LS_KEY = 'lifeos_ai_v1';
+const LS_KEY = 'lifeos_v1';
 
 const QUOTES = [
   "Discipline is choosing between what you want now and what you want most.",
