@@ -29,6 +29,7 @@ function showAuth(view){
   document.getElementById('mobileNav').classList.add('hidden');
   document.getElementById('loginView').classList.toggle('hidden', view!=='login');
   document.getElementById('signupView').classList.toggle('hidden', view!=='signup');
+  document.getElementById('forgotView').classList.toggle('hidden', view!=='forgot');
 }
 
 function enterApp(){
@@ -42,6 +43,26 @@ function enterApp(){
 function wireAuthForms(){
   document.getElementById('goSignup').onclick = ()=>showAuth('signup');
   document.getElementById('goLogin').onclick = ()=>showAuth('login');
+  document.getElementById('goForgot').onclick = (e)=>{ e.preventDefault(); showAuth('forgot'); };
+document.getElementById('backToLogin').onclick = (e)=>{ e.preventDefault(); showAuth('login'); };
+
+document.getElementById('forgotForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const email = document.getElementById('forgotEmail').value;
+  const errEl = document.getElementById('forgotError');
+
+  if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if(error){ errEl.textContent = error.message; errEl.classList.remove('hidden'); return; }
+    errEl.classList.add('hidden');
+    toast('Check your email for a password reset link.', 'success');
+    showAuth('login');
+  } else {
+    toast('Local-only mode: no email to send to. Log in and use Change Password in Settings instead.', 'info');
+  }
+});
 
   document.getElementById('loginForm').addEventListener('submit', async e=>{
     e.preventDefault();
