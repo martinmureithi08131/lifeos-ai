@@ -11,7 +11,7 @@ const QUOTES = [
   "Small daily habits build unshakeable decades.",
   "Every expert was once a beginner who refused to quit.",
   "Financial freedom is bought with patience, not luck.",
-  "Track it to change it — what gets measured gets managed.",
+  "Track it to change it what gets measured gets managed.",
   "Build the life you want on paper first, then go build it for real."
 ];
 
