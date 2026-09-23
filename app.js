@@ -19,6 +19,32 @@ async function boot(){
       window.__sbUserId = null;
     }
     logout(); // clears local state.auth
+    async function boot(){
+  applyTheme();
+  wireAuthForms();
+  wireShellChrome();
+
+  // Detect a password-recovery link landing on this page
+  const isRecovery = window.location.hash.includes('type=recovery');
+
+  setTimeout(async ()=>{
+    document.getElementById('loaderScreen').style.opacity = '0';
+    document.getElementById('loaderScreen').style.visibility = 'hidden';
+
+    if(isRecovery){
+      showAuth('reset');
+      return; // don't sign out / don't show login yet — Supabase already
+              // created a temporary session from the recovery token
+    }
+
+    if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
+      await sbSignOut();
+      window.__sbUserId = null;
+    }
+    logout();
+    showAuth('login');
+  }, 550);
+}
     showAuth('login');
   }, 550);
 }
@@ -30,6 +56,7 @@ function showAuth(view){
   document.getElementById('loginView').classList.toggle('hidden', view!=='login');
   document.getElementById('signupView').classList.toggle('hidden', view!=='signup');
   document.getElementById('forgotView').classList.toggle('hidden', view!=='forgot');
+  document.getElementById('resetPasswordView').classList.toggle('hidden', view!=='reset');
 }
 
 function enterApp(){
@@ -50,6 +77,23 @@ document.getElementById('forgotForm').addEventListener('submit', async e=>{
   e.preventDefault();
   const email = document.getElementById('forgotEmail').value;
   const errEl = document.getElementById('forgotError');
+  document.getElementById('resetPasswordForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const pw = document.getElementById('newPassword').value;
+  const pw2 = document.getElementById('newPassword2').value;
+  const errEl = document.getElementById('resetError');
+
+  if(pw !== pw2){ errEl.textContent = 'Passwords do not match.'; errEl.classList.remove('hidden'); return; }
+
+  const { error } = await sb.auth.updateUser({ password: pw });
+  if(error){ errEl.textContent = error.message; errEl.classList.remove('hidden'); return; }
+
+  errEl.classList.add('hidden');
+  toast('Password updated — please log in.', 'success');
+  await sb.auth.signOut();
+  window.location.hash = '';
+  showAuth('login');
+});
 
   if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
     const { error } = await sb.auth.resetPasswordForEmail(email, {
