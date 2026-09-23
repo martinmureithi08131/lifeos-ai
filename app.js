@@ -948,7 +948,26 @@ function renderFI(){
     ${fi.hasData ? progressBar(fi.pct,'var(--gold)') : ''}
   </div>`;
 }
+function goalCategoryChipClass(category){
+  const map = { Career:'navy', Finance:'emerald', Health:'blue', Personal:'gold', Car:'rose', House:'amber', Investment:'gold' };
+  return map[category] || 'gold';
+}
 
+function goalDetailsLine(g){
+  const d = g.details || {};
+  if(g.category==='Car' && (d.make || d.model || d.year || d.price)){
+    const bits = [d.make, d.model, d.year? `(${d.year})`:''].filter(Boolean).join(' ');
+    return `<div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">${escapeHtml(bits)}${d.price? ` · ${fmtMoney(d.price)}`:''}</div>`;
+  }
+  if(g.category==='House' && (d.location || d.price || d.design || d.bedrooms)){
+    const bits = [d.location, d.design, d.bedrooms? `${d.bedrooms} bed`:''].filter(Boolean).join(' · ');
+    return `<div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">${escapeHtml(bits)}${d.price? ` · ${fmtMoney(d.price)}`:''}</div>`;
+  }
+  if(g.category==='Investment' && (d.where || d.amount)){
+    return `<div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">${escapeHtml(d.where||'')}${d.amount? ` · ${fmtMoney(d.amount)}`:''}${d.notes? ` · ${escapeHtml(d.notes)}`:''}</div>`;
+  }
+  return '';
+}
 
 /* ==========================================================================
    GOALS, TO-DOS & TRACKED EVENTS
@@ -994,16 +1013,17 @@ function renderGoals(){
       <button class="icon-btn" style="margin-left:auto; width:28px; height:28px;" id="addGoalBtn"><i class="fa-solid fa-plus" style="font-size:11px;"></i></button>
     </div>
     <div style="margin-top:10px;">
-      ${goals.length ? goals.map(g=>{
+            ${goals.length ? goals.map(g=>{
         const yrsAway = g.deadline ? ((new Date(g.deadline) - new Date())/(1000*60*60*24*365)).toFixed(1) : null;
         return `
         <div class="list-row">
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <span style="font-weight:600; font-size:13.5px;">${escapeHtml(g.title)}</span>
-              <span class="chip ${g.category==='Career'?'navy':g.category==='Finance'?'emerald':g.category==='Health'?'blue':'gold'}">${escapeHtml(g.category||'General')}</span>
+              <span class="chip ${goalCategoryChipClass(g.category)}">${escapeHtml(g.category||'General')}</span>
               ${g.deadline? `<span style="font-size:11px; color:var(--text-tertiary);">due ${escapeHtml(g.deadline)}${yrsAway>0?` · ~${yrsAway} yrs away`:''}</span>`:''}
             </div>
+            ${goalDetailsLine(g)}
             <div style="margin-top:8px;">${progressBar(g.completion||0, scoreColor(g.completion||0))}</div>
           </div>
           <div class="mono" style="width:44px; text-align:right;">${g.completion||0}%</div>
@@ -1410,17 +1430,70 @@ function openAddLoanModal(){
     closeModal(); render(); toast('Loan added.','success');
   };
 }
+const GOAL_CATEGORIES = ['Career','Finance','Health','Personal','Car','House','Investment'];
+
+function goalDetailFieldsHTML(category){
+  if(category==='Car'){
+    return `
+      <div class="field-row">
+        <div class="field"><label>Make</label><input type="text" id="mCarMake" placeholder="e.g. Toyota"></div>
+        <div class="field"><label>Model</label><input type="text" id="mCarModel" placeholder="e.g. Prado"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Year of Manufacture</label><input type="number" id="mCarYear" placeholder="e.g. 2022"></div>
+        <div class="field"><label>Price (KES)</label><input type="number" id="mCarPrice" value="0"></div>
+      </div>`;
+  }
+  if(category==='House'){
+    return `
+      <div class="field-row">
+        <div class="field"><label>Location</label><input type="text" id="mHouseLocation" placeholder="e.g. Nakuru, Milimani"></div>
+        <div class="field"><label>Price (KES)</label><input type="number" id="mHousePrice" value="0"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Design</label><input type="text" id="mHouseDesign" placeholder="e.g. Bungalow, Maisonette"></div>
+        <div class="field"><label>Bedrooms</label><input type="number" id="mHouseBedrooms" placeholder="e.g. 4"></div>
+      </div>`;
+  }
+  if(category==='Investment'){
+    return `
+      <div class="field-row">
+        <div class="field"><label>Where (platform/institution)</label><input type="text" id="mInvWhere" placeholder="e.g. CIC Money Market Fund"></div>
+        <div class="field"><label>Amount (KES)</label><input type="number" id="mInvAmount" value="0"></div>
+      </div>
+      <div class="field"><label>Notes</label><input type="text" id="mInvNotes" placeholder="e.g. Target 20% of portfolio"></div>`;
+  }
+  return ''; // Career / Finance / Health / Personal — no special fields
+}
+
 function openAddGoalModal(){
   openModal('Add Goal', `
     <div class="field"><label>Title</label><input type="text" id="mTitle" placeholder="e.g. Buy a car"></div>
-    <div class="field"><label>Category</label><select id="mCategory"><option>Career</option><option>Finance</option><option>Health</option><option>Personal</option></select></div>
+    <div class="field"><label>Category</label>
+      <select id="mCategory">${GOAL_CATEGORIES.map(c=>`<option>${c}</option>`).join('')}</select>
+    </div>
+    <div id="mGoalDetails">${goalDetailFieldsHTML(GOAL_CATEGORIES[0])}</div>
     <div class="field"><label>Deadline</label><input type="date" id="mDeadline"></div>
     <div class="field"><label>Completion (%)</label><input type="number" id="mCompletion" value="0" min="0" max="100"></div>
   `, `<button class="btn btn-ghost btn-block" id="mCancel">Cancel</button><button class="btn btn-primary btn-block" id="mSave">Add</button>`);
+
+  document.getElementById('mCategory').onchange = e=>{
+    document.getElementById('mGoalDetails').innerHTML = goalDetailFieldsHTML(e.target.value);
+  };
+
   document.getElementById('mCancel').onclick = closeModal;
   document.getElementById('mSave').onclick = ()=>{
     if(!val('mTitle')) return toast('Goal title required.','warn');
-    addItem('goals', { title:val('mTitle'), category:val('mCategory'), deadline:val('mDeadline'), completion:clamp(num('mCompletion'),0,100) });
+    const category = val('mCategory');
+    let details = {};
+    if(category==='Car'){
+      details = { make:val('mCarMake'), model:val('mCarModel'), year:val('mCarYear'), price:num('mCarPrice') };
+    } else if(category==='House'){
+      details = { location:val('mHouseLocation'), price:num('mHousePrice'), design:val('mHouseDesign'), bedrooms:val('mHouseBedrooms') };
+    } else if(category==='Investment'){
+      details = { where:val('mInvWhere'), amount:num('mInvAmount'), notes:val('mInvNotes') };
+    }
+    addItem('goals', { title:val('mTitle'), category, deadline:val('mDeadline'), completion:clamp(num('mCompletion'),0,100), details });
     closeModal(); render(); toast('Goal added.','success');
   };
 }
