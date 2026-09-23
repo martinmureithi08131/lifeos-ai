@@ -75,6 +75,16 @@
   </form>
   <div class="auth-switch"><a href="#" id="backToLogin">Back to log in</a></div>
 </div>
+  <div id="resetPasswordView" class="hidden">
+  <h2>Set a new password</h2>
+  <p class="sub">Enter a new password for your account.</p>
+  <form id="resetPasswordForm">
+    <div class="field"><label>New Password</label><input type="password" id="newPassword" minlength="6" required></div>
+    <div class="field"><label>Confirm Password</label><input type="password" id="newPassword2" minlength="6" required></div>
+    <div id="resetError" class="hidden" style="color:var(--danger); font-size:13px; margin-bottom:12px;"></div>
+    <button class="btn btn-primary btn-block" type="submit"><i class="fa-solid fa-check"></i> Update Password</button>
+  </form>
+</div>
 <!-- ===================== APP SHELL ===================== -->
 <div class="app-shell hidden" id="appShell">
   <aside class="sidebar">
