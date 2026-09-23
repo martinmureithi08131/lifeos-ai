@@ -1447,7 +1447,7 @@ function goalDetailFieldsHTML(category){
   if(category==='House'){
     return `
       <div class="field-row">
-        <div class="field"><label>Location</label><input type="text" id="mHouseLocation" placeholder="e.g. Nakuru, Milimani"></div>
+        <div class="field"><label>Location</label><input type="text" id="mHouseLocation" placeholder="e.g. Muthaiga, Milimani"></div>
         <div class="field"><label>Price (KES)</label><input type="number" id="mHousePrice" value="0"></div>
       </div>
       <div class="field-row">
