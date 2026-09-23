@@ -644,7 +644,7 @@ function renderAcademics(){
 
   <div class="grid grid-4" style="margin-bottom:22px;">
     <div class="glass card">
-      <div class="field"><label>Current CGPA</label><input type="number" step="0.01" id="acgpa" value="${escapeHtml(a.cgpa)}"></div>
+      <div class="field"><label>Current Grade</label><input type="number" step="0.01" id="acgpa" value="${escapeHtml(a.cgpa)}"></div>
     </div>
     <div class="glass card">
       <div class="field"><label>Semester</label><input type="text" id="asem" value="${escapeHtml(a.semester)}"></div>
