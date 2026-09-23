@@ -286,7 +286,7 @@ function renderDashboard(){
       <div class="glass card" style="text-align:center; padding:48px 24px;">
         <i class="fa-solid fa-seedling" style="font-size:32px; color:var(--gold); margin-bottom:14px; display:block;"></i>
         <h3 style="font-family:var(--font-display); margin-bottom:8px;">Your LifeOS is empty so far</h3>
-        <p style="color:var(--text-secondary); max-width:440px; margin:0 auto 18px;">Start with your Profile, then add a goal or two, log your finances, or track a habit — this page will turn into a running summary of your life as you go.</p>
+        <p style="color:var(--text-secondary); max-width:440px; margin:0 auto 18px;">Start with your Profile, then add a goal or two, log your finances, or track a habit this page will turn into a running summary of your life as you go.</p>
         <button class="btn btn-primary" onclick="go('profile')"><i class="fa-solid fa-user"></i>Set up your profile</button>
       </div>`;
   }
@@ -342,7 +342,7 @@ function buildLifeSummary(){
   const lines = [];
 
   // Who you are
-  let intro = `You're`;
+  let intro = `Welcome to the Program`;
   if(p.fullName) intro += ` ${escapeHtml(p.fullName)},`;
   if(p.age) intro += ` ${p.age} years old,`;
   if(p.occupation) intro += ` working as ${escapeHtml(p.occupation)}`;
