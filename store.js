@@ -334,7 +334,7 @@ function signup(name, email, password){
   state.users[email] = { password, createdAt: new Date().toISOString() };
   state.profile.fullName = name;
   state.auth = { loggedIn:true, currentUserEmail: email };
-  pushNotification(`Welcome to LifeOS AI, ${name.split(' ')[0]}.`, 'fa-sparkles', 'success');
+  pushNotification(`Welcome to LifeOS, ${name.split(' ')[0]}.`, 'fa-sparkles', 'success');
   save();
   return { ok:true };
 }
