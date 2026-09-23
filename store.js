@@ -48,6 +48,7 @@ function defaultState(){
       history:[]
     },
     investments: [],
+    ifoaExams: [],
     loans: [],
     futurePlans: [],
     habits: [],
@@ -357,4 +358,42 @@ function buildAIPriorities(){
   if(corporateReadinessScore()<60) list.push('Invest time in networking and certifications for corporate readiness.');
   if(!list.length) list.push('Maintain current discipline — you are on track across all fronts.');
   return list;
+}
+/* ---------------- IFoA Exam catalog & tracker ---------------- */
+const IFOA_CATALOG = [
+  { code:'CS1', name:'Actuarial Statistics 1', stage:'Core Principles' },
+  { code:'CS2', name:'Actuarial Statistics 2', stage:'Core Principles' },
+  { code:'CM1', name:'Actuarial Mathematics 1', stage:'Core Principles' },
+  { code:'CM2', name:'Actuarial Mathematics 2', stage:'Core Principles' },
+  { code:'CB1', name:'Business Finance', stage:'Core Principles' },
+  { code:'CB2', name:'Business Economics', stage:'Core Principles' },
+  { code:'CB3', name:'Business Management', stage:'Core Principles' },
+  { code:'CP1', name:'Actuarial Practice', stage:'Core Practices' },
+  { code:'CP2', name:'Modelling Practice', stage:'Core Practices' },
+  { code:'CP3', name:'Communications Practice', stage:'Core Practices' },
+  { code:'SP1', name:'Health and Care', stage:'Specialist Principles' },
+  { code:'SP2', name:'Life Insurance', stage:'Specialist Principles' },
+  { code:'SP4', name:'Pensions and Other Benefits', stage:'Specialist Principles' },
+  { code:'SP5', name:'Investment and Finance', stage:'Specialist Principles' },
+  { code:'SP6', name:'Financial Derivatives', stage:'Specialist Principles' },
+  { code:'SP7', name:'General Insurance – Reserving and Capital Modelling', stage:'Specialist Principles' },
+  { code:'SP8', name:'General Insurance – Pricing', stage:'Specialist Principles' },
+  { code:'SP9', name:'Enterprise Risk Management', stage:'Specialist Principles' },
+  { code:'SA1', name:'Health and Care', stage:'Specialist Advanced' },
+  { code:'SA2', name:'Life Insurance', stage:'Specialist Advanced' },
+  { code:'SA3', name:'General Insurance', stage:'Specialist Advanced' },
+  { code:'SA4', name:'Pensions and Other Benefits', stage:'Specialist Advanced' },
+  { code:'SA7', name:'Investment and Finance', stage:'Specialist Advanced' },
+];
+const IFOA_STATUSES = ['Not Started','Studying','Registered','Waiting for Results','Passed','Failed','Exempted'];
+
+function ifoaSummary(){
+  const exams = state.ifoaExams||[];
+  const totalFees = exams.reduce((a,e)=>a+(Number(e.fee)||0),0);
+  const totalPaid = exams.filter(e=>e.feePaid).reduce((a,e)=>a+(Number(e.fee)||0),0);
+  const passed = exams.filter(e=>e.status==='Passed').length;
+  const failed = exams.filter(e=>e.status==='Failed').length;
+  const attempted = passed+failed;
+  const passRate = attempted>0 ? Math.round((passed/attempted)*100) : null;
+  return { totalFees, totalPaid, passed, failed, passRate, count: exams.length };
 }
