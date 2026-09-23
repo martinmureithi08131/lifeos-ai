@@ -31,7 +31,7 @@ function defaultState(){
     users: {}, // email -> {password, createdAt}
     theme: 'dark',
     profile: {
-      fullName:'', age:23, gender:'', country:'Kenya', city:'Nakuru',
+      fullName:'', age:23, gender:'', country:'Kenya', city:'Nairobi',
       university:'', highestEducation:'', occupation:'', industry:'',
       currentSalary:0, expectedSalary:0, yearsExperience:0,
       careerGoals:'', financialGoals:'', relationshipStatus:'', children:0,
@@ -39,7 +39,11 @@ function defaultState(){
       preferredInvestment:'', preferredLearningStyle:'', skills:'', certificates:'',
       languages:'', interests:'', healthGoals:'', photo:'', level:'Intern', xp:0
     },
-    goals: [],
+    
+  goals: [],
+todos: [],
+trackedEvents: [],
+    
     academics: { cgpa:'', semester:'', studyHours:0, coursesTracked:[], booksRead:0, streak:0 },
     career: { applications:[], interviews:[], cvVersion:1, networkContacts:0, linkedinGoal:0, linkedinCurrent:0 },
     finance: {
@@ -154,6 +158,28 @@ function goalCompletionPct(){
   const g = state.goals||[];
   if(!g.length) return 0;
   return Math.round(g.reduce((a,x)=>a+(Number(x.completion)||0),0)/g.length);
+}
+/* ---------------- To-Do List & Tracked Events ---------------- */
+const TODO_TIMEFRAMES = ['This Week','This Month','Next 6 Months','This Year'];
+
+function todoStats(timeframe){
+  const items = (state.todos||[]).filter(t=>t.timeframe===timeframe);
+  const done = items.filter(t=>t.done).length;
+  return { items, done, total: items.length };
+}
+
+function eventTotalSpent(ev){
+  return (ev.expenses||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
+}
+
+// Success rate: 100% = nothing spent yet, 0% = spent exactly the budget,
+// negative = over budget by that percentage.
+function eventSuccessRate(ev){
+  const spent = eventTotalSpent(ev);
+  const budget = Number(ev.budget)||0;
+  if(budget<=0) return { spent, budget, pct:null, onTrack:null };
+  const pct = Math.round(((budget-spent)/budget)*100);
+  return { spent, budget, pct, onTrack: spent<=budget };
 }
 
 /* ---------------- Corporate Readiness Score ---------------- */
