@@ -150,7 +150,7 @@ const PAGE_META = {
   investments:['Investments', 'LIFEOS / MONEY / INVESTMENTS'],
   loans:      ['Loans', 'LIFEOS / MONEY / LOANS'],
   fi:         ['Financial Independence', 'LIFEOS / MONEY / FI TRACKER'],
-  goals:      ['Goals', 'LIFEOS / VISION / GOALS'],
+    goals:      ['Goals & To-Dos', 'LIFEOS / VISION / GOALS & TO-DOS'],
   future:     ['Future Plans', 'LIFEOS / VISION / FUTURE PLANS'],
   visionboard:['Vision Board', 'LIFEOS / VISION / BOARD'],
   documents:  ['Documents', 'LIFEOS / VISION / DOCUMENTS'],
@@ -949,35 +949,109 @@ function renderFI(){
   </div>`;
 }
 
+
 /* ==========================================================================
-   GOALS
+   GOALS, TO-DOS & TRACKED EVENTS
    ========================================================================== */
 function renderGoals(){
   const goals = state.goals||[];
+  const events = state.trackedEvents||[];
   return `
   <div class="module-hero theme-future">
-    <div><h2><i class="fa-solid fa-bullseye hero-icon" style="margin-right:10px;"></i>Goals</h2>
-    <p>Write it down, track it, and watch it move from wish to reality.</p></div>
+    <div><h2><i class="fa-solid fa-bullseye hero-icon" style="margin-right:10px;"></i>Goals & To-Dos</h2>
+    <p>Weekly tasks, long-term goals, and budget-tracked events like moves or big occasions.</p></div>
     ${ringSVG(goalCompletionPct(), 96, 8, 'var(--rose)', false, goalCompletionPct(), '%')}
   </div>
-  <div class="glass card">
-    <div class="card-title"><i class="fa-solid fa-list"></i>My Goals
+
+  <div class="glass card" style="margin-bottom:22px;">
+    <div class="card-title"><i class="fa-solid fa-list-check"></i>To-Do List
+      <button class="icon-btn" style="margin-left:auto; width:28px; height:28px;" id="addTodoBtn"><i class="fa-solid fa-plus" style="font-size:11px;"></i></button>
+    </div>
+    <div style="margin-top:14px; display:flex; flex-direction:column; gap:18px;">
+      ${TODO_TIMEFRAMES.map(tf=>{
+        const stats = todoStats(tf);
+        return `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:12.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em;">${tf}</span>
+            <span class="mono" style="font-size:11.5px; color:var(--text-tertiary);">${stats.done}/${stats.total} done</span>
+          </div>
+          ${stats.items.length ? stats.items.map(t=>`
+            <div class="list-row">
+              <label style="display:flex; align-items:center; gap:10px; flex:1; cursor:pointer;">
+                <input type="checkbox" data-toggle-todo="${t.id}" ${t.done?'checked':''} style="width:16px; height:16px;">
+                <span style="font-size:13.5px; ${t.done?'text-decoration:line-through; color:var(--text-tertiary);':''}">${escapeHtml(t.title)}</span>
+              </label>
+              <button class="icon-btn" data-del-todo="${t.id}" style="width:28px;height:28px;"><i class="fa-solid fa-trash" style="font-size:10px;"></i></button>
+            </div>`).join('') : `<div style="font-size:12.5px; color:var(--text-tertiary); padding:6px 0;">Nothing here yet.</div>`}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <div class="glass card" style="margin-bottom:22px;">
+    <div class="card-title"><i class="fa-solid fa-flag-checkered"></i>Long-Term Goals
       <button class="icon-btn" style="margin-left:auto; width:28px; height:28px;" id="addGoalBtn"><i class="fa-solid fa-plus" style="font-size:11px;"></i></button>
     </div>
     <div style="margin-top:10px;">
-      ${goals.length ? goals.map(g=>`
+      ${goals.length ? goals.map(g=>{
+        const yrsAway = g.deadline ? ((new Date(g.deadline) - new Date())/(1000*60*60*24*365)).toFixed(1) : null;
+        return `
         <div class="list-row">
           <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <span style="font-weight:600; font-size:13.5px;">${escapeHtml(g.title)}</span>
               <span class="chip ${g.category==='Career'?'navy':g.category==='Finance'?'emerald':g.category==='Health'?'blue':'gold'}">${escapeHtml(g.category||'General')}</span>
-              ${g.deadline? `<span style="font-size:11px; color:var(--text-tertiary);">due ${escapeHtml(g.deadline)}</span>`:''}
+              ${g.deadline? `<span style="font-size:11px; color:var(--text-tertiary);">due ${escapeHtml(g.deadline)}${yrsAway>0?` · ~${yrsAway} yrs away`:''}</span>`:''}
             </div>
             <div style="margin-top:8px;">${progressBar(g.completion||0, scoreColor(g.completion||0))}</div>
           </div>
           <div class="mono" style="width:44px; text-align:right;">${g.completion||0}%</div>
           <button class="icon-btn" data-del-goal="${g.id}" style="width:30px;height:30px;"><i class="fa-solid fa-trash" style="font-size:11px;"></i></button>
-        </div>`).join('') : emptyState('fa-bullseye','No goals yet. Set your first one.')}
+        </div>`;
+      }).join('') : emptyState('fa-bullseye','No long-term goals yet — a car, a house, an investment target.')}
+    </div>
+  </div>
+
+  <div class="glass card">
+    <div class="card-title"><i class="fa-solid fa-money-bill-trend-up"></i>Tracked Events & Budgets
+      <button class="icon-btn" style="margin-left:auto; width:28px; height:28px;" id="addEventBtn"><i class="fa-solid fa-plus" style="font-size:11px;"></i></button>
+    </div>
+    <div style="margin-top:10px; display:flex; flex-direction:column; gap:16px;">
+      ${events.length ? events.map(ev=>{
+        const r = eventSuccessRate(ev);
+        const chipClass = r.pct===null ? 'navy' : (r.pct>=0 ? 'emerald' : 'rose');
+        return `
+        <div style="border:1px solid var(--border); border-radius:14px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="font-weight:600; font-size:14px;">${escapeHtml(ev.name)}</div>
+              <div style="font-size:11.5px; color:var(--text-tertiary); margin-top:2px;">${ev.eventDate? escapeHtml(ev.eventDate) : 'No date set'}</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span class="chip ${chipClass}">${r.pct===null? 'No budget set' : (r.pct>=0? r.pct+'% under budget' : Math.abs(r.pct)+'% over budget')}</span>
+              <button class="icon-btn" data-del-event="${ev.id}" style="width:28px;height:28px;"><i class="fa-solid fa-trash" style="font-size:10px;"></i></button>
+            </div>
+          </div>
+          <div class="field-row" style="margin-top:12px;">
+            <div class="stat-label">Budget: <span class="mono">${fmtMoney(ev.budget)}</span></div>
+            <div class="stat-label">Spent: <span class="mono">${fmtMoney(r.spent)}</span></div>
+          </div>
+          ${ev.budget>0 ? progressBar(clamp((r.spent/ev.budget)*100,0,100), r.onTrack? 'var(--emerald)':'var(--rose)') : ''}
+          <div style="margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Expenses</span>
+              <button class="btn btn-sm btn-ghost" data-add-expense="${ev.id}"><i class="fa-solid fa-plus"></i> Add expense</button>
+            </div>
+            ${(ev.expenses||[]).length ? ev.expenses.map(x=>`
+              <div class="list-row">
+                <span style="font-size:13px;">${escapeHtml(x.label)}</span>
+                <span class="mono" style="font-size:13px;">${fmtMoney(x.amount)}</span>
+                <button class="icon-btn" data-del-expense="${ev.id}|${x.id}" style="width:26px;height:26px;"><i class="fa-solid fa-trash" style="font-size:10px;"></i></button>
+              </div>`).join('') : `<div style="font-size:12px; color:var(--text-tertiary);">No expenses logged yet.</div>`}
+          </div>
+        </div>`;
+      }).join('') : emptyState('fa-money-bill-trend-up','No tracked events yet — try "Moving weekend" or "Graduation".')}
     </div>
   </div>`;
 }
@@ -1188,9 +1262,28 @@ function wirePageEvents(page){
     };
   }
 
-  if(page==='goals'){
+    if(page==='goals'){
+    document.getElementById('addTodoBtn').onclick = openAddTodoModal;
     document.getElementById('addGoalBtn').onclick = openAddGoalModal;
+    document.getElementById('addEventBtn').onclick = openAddEventModal;
+
+    document.querySelectorAll('[data-toggle-todo]').forEach(cb=> cb.onchange = ()=>{
+      const t = (state.todos||[]).find(x=>x.id===cb.dataset.toggleTodo);
+      t.done = cb.checked;
+      save(); render();
+    });
+    document.querySelectorAll('[data-del-todo]').forEach(b=> b.onclick = ()=> confirmDelete('To-do', ()=>{ removeItem('todos', b.dataset.delTodo); render(); }));
     document.querySelectorAll('[data-del-goal]').forEach(b=> b.onclick = ()=> confirmDelete('Goal', ()=>{ removeItem('goals', b.dataset.delGoal); render(); }));
+    document.querySelectorAll('[data-del-event]').forEach(b=> b.onclick = ()=> confirmDelete('Event', ()=>{ removeItem('trackedEvents', b.dataset.delEvent); render(); }));
+    document.querySelectorAll('[data-add-expense]').forEach(b=> b.onclick = ()=> openAddExpenseModal(b.dataset.addExpense));
+    document.querySelectorAll('[data-del-expense]').forEach(b=> b.onclick = ()=>{
+      const [eventId, expId] = b.dataset.delExpense.split('|');
+      confirmDelete('Expense', ()=>{
+        const ev = (state.trackedEvents||[]).find(x=>x.id===eventId);
+        ev.expenses = (ev.expenses||[]).filter(x=>x.id!==expId);
+        save(); render();
+      });
+    });
   }
 
   if(page==='future'){
@@ -1329,6 +1422,47 @@ function openAddGoalModal(){
     if(!val('mTitle')) return toast('Goal title required.','warn');
     addItem('goals', { title:val('mTitle'), category:val('mCategory'), deadline:val('mDeadline'), completion:clamp(num('mCompletion'),0,100) });
     closeModal(); render(); toast('Goal added.','success');
+  };
+}
+function openAddTodoModal(){
+  openModal('Add To-Do', `
+    <div class="field"><label>Task</label><input type="text" id="mTodoTitle" placeholder="e.g. Pack kitchen boxes"></div>
+    <div class="field"><label>Timeframe</label><select id="mTodoTimeframe">${TODO_TIMEFRAMES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+  `, `<button class="btn btn-ghost btn-block" id="mCancel">Cancel</button><button class="btn btn-primary btn-block" id="mSave">Add</button>`);
+  document.getElementById('mCancel').onclick = closeModal;
+  document.getElementById('mSave').onclick = ()=>{
+    if(!val('mTodoTitle')) return toast('Task title required.','warn');
+    addItem('todos', { title: val('mTodoTitle'), timeframe: val('mTodoTimeframe'), done:false });
+    closeModal(); render(); toast('To-do added.','success');
+  };
+}
+
+function openAddEventModal(){
+  openModal('Track a New Event', `
+    <div class="field"><label>Event name</label><input type="text" id="mEventName" placeholder="e.g. Moving weekend, Graduation"></div>
+    <div class="field"><label>Event date</label><input type="date" id="mEventDate"></div>
+    <div class="field"><label>Budget (KES)</label><input type="number" id="mEventBudget" value="0"></div>
+  `, `<button class="btn btn-ghost btn-block" id="mCancel">Cancel</button><button class="btn btn-primary btn-block" id="mSave">Add</button>`);
+  document.getElementById('mCancel').onclick = closeModal;
+  document.getElementById('mSave').onclick = ()=>{
+    if(!val('mEventName')) return toast('Event name required.','warn');
+    addItem('trackedEvents', { name: val('mEventName'), eventDate: val('mEventDate'), budget: num('mEventBudget'), expenses: [] });
+    closeModal(); render(); toast('Event added.','success');
+  };
+}
+
+function openAddExpenseModal(eventId){
+  openModal('Log Expense', `
+    <div class="field"><label>Description</label><input type="text" id="mExpLabel" placeholder="e.g. Moving truck rental"></div>
+    <div class="field"><label>Amount (KES)</label><input type="number" id="mExpAmount" value="0"></div>
+  `, `<button class="btn btn-ghost btn-block" id="mCancel">Cancel</button><button class="btn btn-primary btn-block" id="mSave">Add</button>`);
+  document.getElementById('mCancel').onclick = closeModal;
+  document.getElementById('mSave').onclick = ()=>{
+    if(!val('mExpLabel')) return toast('Description required.','warn');
+    const ev = (state.trackedEvents||[]).find(x=>x.id===eventId);
+    if(!ev.expenses) ev.expenses = [];
+    ev.expenses.push({ id: 'exp_'+Date.now()+'_'+Math.floor(Math.random()*10000), label: val('mExpLabel'), amount: num('mExpAmount') });
+    save(); closeModal(); render(); toast('Expense logged.','success');
   };
 }
 function openAddPlanModal(){
