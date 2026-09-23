@@ -573,7 +573,7 @@ function renderAcademics(){
   return `
   <div class="module-hero theme-academics">
     <div><h2><i class="fa-solid fa-graduation-cap hero-icon" style="margin-right:10px;"></i>Academics</h2>
-    <p>Track your CGPA, study discipline and reading habit — the foundation your career score is built on.</p></div>
+    <p>Track your academic results, study discipline and reading habit the foundation your career score is built on.</p></div>
     ${ringSVG(scoreAcademic(), 96, 8, 'var(--blue)', false, scoreAcademic(), '/100')}
   </div>
 
@@ -695,7 +695,7 @@ function renderIfoa(){
   return `
   <div class="module-hero theme-career">
     <div><h2><i class="fa-solid fa-scroll hero-icon" style="margin-right:10px;"></i>IFoA Exams</h2>
-    <p>Every paper you're sitting — status, exam diet, and fees, from Not Started to Pass or Fail.</p></div>
+    <p>Every paper you're sitting status, exam diet, and fees, from Not Started to Pass or Fail.</p></div>
   </div>
 
   <div class="grid grid-4" style="margin-bottom:22px;">
