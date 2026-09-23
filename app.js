@@ -155,7 +155,7 @@ document.getElementById('forgotForm').addEventListener('submit', async e=>{
       state.auth = { loggedIn:true, currentUserEmail: r.user.email };
       save();
       enterApp();
-      toast('Account created — welcome to LifeOS AI!', 'success');
+      toast('Account created — welcome to LifeOS!', 'success');
       return;
     }
 
@@ -163,7 +163,7 @@ document.getElementById('forgotForm').addEventListener('submit', async e=>{
     if(!r.ok){ errEl.textContent = r.msg; errEl.classList.remove('hidden'); return; }
     errEl.classList.add('hidden');
     enterApp();
-    toast('Account created — welcome to LifeOS AI!', 'success');
+    toast('Account created — welcome to LifeOS!', 'success');
   });
 }
 
