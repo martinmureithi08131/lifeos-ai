@@ -1094,7 +1094,7 @@ function renderGoals(){
           <div class="mono" style="width:44px; text-align:right;">${g.completion||0}%</div>
           <button class="icon-btn" data-del-goal="${g.id}" style="width:30px;height:30px;"><i class="fa-solid fa-trash" style="font-size:11px;"></i></button>
         </div>`;
-      }).join('') : emptyState('fa-bullseye','No long-term goals yet — a car, a house, an investment target.')}
+      }).join('') : emptyState('fa-bullseye','No long-term goals yet  a car, a house, an investment target.')}
     </div>
   </div>
 
@@ -1136,7 +1136,7 @@ function renderGoals(){
               </div>`).join('') : `<div style="font-size:12px; color:var(--text-tertiary);">No expenses logged yet.</div>`}
           </div>
         </div>`;
-      }).join('') : emptyState('fa-money-bill-trend-up','No tracked events yet — try "Moving weekend" or "Graduation".')}
+      }).join('') : emptyState('fa-money-bill-trend-up','No tracked events yet  try "Moving weekend" or "Graduation".')}
     </div>
   </div>`;
 }
