@@ -161,10 +161,24 @@ function goalCompletionPct(){
   return Math.round(g.reduce((a,x)=>a+(Number(x.completion)||0),0)/g.length);
 }
 /* ---------------- To-Do List & Tracked Events ---------------- */
-const TODO_TIMEFRAMES = ['This Week','This Month','Next 6 Months','This Year'];
+const TODO_BUCKETS = ['Overdue','This Week','This Month','Next 6 Months','This Year','Later'];
 
-function todoStats(timeframe){
-  const items = (state.todos||[]).filter(t=>t.timeframe===timeframe);
+function todoBucket(dueDate){
+  if(!dueDate) return 'Later';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const due = new Date(dueDate); due.setHours(0,0,0,0);
+  const diffDays = Math.round((due-now)/(1000*60*60*24));
+  if(diffDays < 0) return 'Overdue';
+  if(diffDays <= 7) return 'This Week';
+  if(diffDays <= 31) return 'This Month';
+  if(diffDays <= 182) return 'Next 6 Months';
+  if(diffDays <= 365) return 'This Year';
+  return 'Later';
+}
+
+function todoStats(bucket){
+  const items = (state.todos||[]).filter(t=> todoBucket(t.dueDate) === bucket);
+  items.sort((a,b)=> (a.dueDate||'9999-99-99').localeCompare(b.dueDate||'9999-99-99'));
   const done = items.filter(t=>t.done).length;
   return { items, done, total: items.length };
 }
