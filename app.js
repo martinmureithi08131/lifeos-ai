@@ -793,7 +793,7 @@ function renderCPA(){
             </select>
             <button class="icon-btn" data-del-CPA="${e.id}" style="width:30px;height:30px;"><i class="fa-solid fa-trash" style="font-size:11px;"></i></button>
           </div>
-        </div>`).join('') : emptyState('fa-scroll','No CPA exams tracked yet. Add CS1, CS2, or whichever paper you\'re on.')}
+        </div>`).join('') : emptyState('fa-scroll','No CPA exams tracked yet.')}
     </div>
   </div>`;
 }
