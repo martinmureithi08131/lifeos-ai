@@ -1566,18 +1566,18 @@ function openAddGoalModal(){
   };
 }
 function openAddTodoModal(){
+  const today = new Date().toISOString().slice(0,10);
   openModal('Add To-Do', `
     <div class="field"><label>Task</label><input type="text" id="mTodoTitle" placeholder="e.g. Pack kitchen boxes"></div>
-    <div class="field"><label>Timeframe</label><select id="mTodoTimeframe">${TODO_TIMEFRAMES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    <div class="field"><label>Due date</label><input type="date" id="mTodoDate" value="${today}"></div>
   `, `<button class="btn btn-ghost btn-block" id="mCancel">Cancel</button><button class="btn btn-primary btn-block" id="mSave">Add</button>`);
   document.getElementById('mCancel').onclick = closeModal;
   document.getElementById('mSave').onclick = ()=>{
     if(!val('mTodoTitle')) return toast('Task title required.','warn');
-    addItem('todos', { title: val('mTodoTitle'), timeframe: val('mTodoTimeframe'), done:false });
+    addItem('todos', { title: val('mTodoTitle'), dueDate: val('mTodoDate'), done:false });
     closeModal(); render(); toast('To-do added.','success');
   };
 }
-
 function openAddEventModal(){
   openModal('Track a New Event', `
     <div class="field"><label>Event name</label><input type="text" id="mEventName" placeholder="e.g. Moving weekend, Graduation"></div>
