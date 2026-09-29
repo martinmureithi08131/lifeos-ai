@@ -12,7 +12,8 @@ const QUOTES = [
   "Every expert was once a beginner who refused to quit.",
   "Financial freedom is bought with patience, not luck.",
   "Track it to change it what gets measured gets managed.",
-  "Build the life you want on paper first, then go build it for real."
+  "Build the life you want on paper first, then go build it for real.",
+  "Track it to change it, what get measured gets managed."
 ];
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
@@ -52,7 +53,7 @@ trackedEvents: [],
       history:[]
     },
     investments: [],
-    ifoaExams: [],
+    CPAExams: [],
     loans: [],
     futurePlans: [],
     habits: [],
@@ -265,8 +266,8 @@ function suggestInvestmentAllocation(){
 const CAREER_ROADMAPS = {
   'Actuary': {
     icon:'fa-calculator', color:'blue',
-    steps:['Pass Actuarial Society exams (CT/CS/CM series or SOA/IFoA)','Secure actuarial analyst role at insurer or consultancy','Build Excel/R/Python modeling skills','Progress to Associate then Fellowship','Specialize in Life, GI or Pensions'],
-    certs:['IFoA / SOA exams','ASSK Student Membership','FRM (complementary)'],
+    steps:['Pass Actuarial Society exams (CT/CS/CM series or SOA/CPA)','Secure actuarial analyst role at insurer or consultancy','Build Excel/R/Python modeling skills','Progress to Associate then Fellowship','Specialize in Life, GI or Pensions'],
+    certs:['CPA / SOA exams','ASSK Student Membership','FRM (complementary)'],
     salaryPath:'Analyst → Associate Actuary → Actuary → Chief Actuary'
   },
   'Data Scientist': {
@@ -385,36 +386,32 @@ function buildAIPriorities(){
   if(!list.length) list.push('Maintain current discipline — you are on track across all fronts.');
   return list;
 }
-/* ---------------- IFoA Exam catalog & tracker ---------------- */
-const IFOA_CATALOG = [
-  { code:'CS1', name:'Actuarial Statistics 1', stage:'Core Principles' },
-  { code:'CS2', name:'Actuarial Statistics 2', stage:'Core Principles' },
-  { code:'CM1', name:'Actuarial Mathematics 1', stage:'Core Principles' },
-  { code:'CM2', name:'Actuarial Mathematics 2', stage:'Core Principles' },
-  { code:'CB1', name:'Business Finance', stage:'Core Principles' },
-  { code:'CB2', name:'Business Economics', stage:'Core Principles' },
-  { code:'CB3', name:'Business Management', stage:'Core Principles' },
-  { code:'CP1', name:'Actuarial Practice', stage:'Core Practices' },
-  { code:'CP2', name:'Modelling Practice', stage:'Core Practices' },
-  { code:'CP3', name:'Communications Practice', stage:'Core Practices' },
-  { code:'SP1', name:'Health and Care', stage:'Specialist Principles' },
-  { code:'SP2', name:'Life Insurance', stage:'Specialist Principles' },
-  { code:'SP4', name:'Pensions and Other Benefits', stage:'Specialist Principles' },
-  { code:'SP5', name:'Investment and Finance', stage:'Specialist Principles' },
-  { code:'SP6', name:'Financial Derivatives', stage:'Specialist Principles' },
-  { code:'SP7', name:'General Insurance – Reserving and Capital Modelling', stage:'Specialist Principles' },
-  { code:'SP8', name:'General Insurance – Pricing', stage:'Specialist Principles' },
-  { code:'SP9', name:'Enterprise Risk Management', stage:'Specialist Principles' },
-  { code:'SA1', name:'Health and Care', stage:'Specialist Advanced' },
-  { code:'SA2', name:'Life Insurance', stage:'Specialist Advanced' },
-  { code:'SA3', name:'General Insurance', stage:'Specialist Advanced' },
-  { code:'SA4', name:'Pensions and Other Benefits', stage:'Specialist Advanced' },
-  { code:'SA7', name:'Investment and Finance', stage:'Specialist Advanced' },
+/* ---------------- CPA Exam catalog & tracker ---------------- */
+const CPA_CATALOG = [
+  { code:'CA11', name:'Finacial Accounting', stage:'FOUNDATION LEVEL' },
+  { code:'CA12', name:'Communication Skills', stage:'FOUNDATION LEVEL' },
+  { code:'CA13', name:'Introduction to Law and Governance', stage:'FOUNDATION LEVEL' },
+  { code:'CA14', name:'Economics', stage:'FOUNDATION LEVEL' },
+  { code:'CA15', name:'Quantitive Analysis', stage:'FOUNDATION LEVEL' },
+  { code:'CA16', name:'Information Communication Technology', stage:'FOUNDATION LEVEL' },
+  { code:'CA21', name:'Company Law', stage:'INTERMEDIATE LEVEL' },
+  { code:'CA22', name:'Financial Management', stage:'INTERMEDIATE LEVEL' },
+  { code:'CA23', name:'Financial Reporting and Analysis', stage:'INTERMEDIATE LEVEL' },
+  { code:'CA24', name:'Auditing and Assurance', stage:'INTERMEDIATE LEVEL' },
+  { code:'CA25', name:'Management Accounting', stage:'INTERMEDIATE LEVEL' },
+  { code:'CA26', name:'Public Finance and Taxation', stage:'INTERMEDIATE LEVEL' },
+  { code:'CA31', name:'Leadership and Management', stage:'ADVANCED LEVEL' },
+  { code:'CA32', name:'Advanced Financial Reporting and Analysis', stage:'ADVANCED LEVELs' },
+  { code:'CA33', name:'Advanced Financial Management', stage:'ADVANCED LEVELs' },
+  { code:'CA34S1', name:'Advanced Taxation', stage:'ADVANCED LEVEL' },
+  { code:'CA34S2', name:'Advanced Auditing and Assurance', stage:'ADVANCED LEVELs' },
+  { code:'CA34S3', name:'Advanced Management Accounting', stage:'ADVANCED LEVEL' },
+  { code:'CA34S4', name:'Advanced Public Financial Management', stage:'ADVANCED LEVEL' },
 ];
-const IFOA_STATUSES = ['Not Started','Studying','Registered','Waiting for Results','Passed','Failed','Exempted'];
+const CPA_STATUSES = ['Not Started','Studying','Registered','Waiting for Results','Passed','Failed','Exempted'];
 
-function ifoaSummary(){
-  const exams = state.ifoaExams||[];
+function CPASummary(){
+  const exams = state.CPAExams||[];
   const totalFees = exams.reduce((a,e)=>a+(Number(e.fee)||0),0);
   const totalPaid = exams.filter(e=>e.feePaid).reduce((a,e)=>a+(Number(e.fee)||0),0);
   const passed = exams.filter(e=>e.status==='Passed').length;
