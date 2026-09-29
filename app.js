@@ -208,7 +208,7 @@ const PAGE_META = {
   profile:    ['Profile', 'LIFEOS / PROFILE'],
   academics:  ['Academics', 'LIFEOS / GROWTH / ACADEMICS'],
   career:     ['Career', 'LIFEOS / GROWTH / CAREER'],
-  ifoa:       ['IFoA Exams', 'LIFEOS / GROWTH / IFOA EXAMS'],
+  CPA:       ['CPA Exams', 'LIFEOS / GROWTH / CPA EXAMS'],
   habits:     ['Habits', 'LIFEOS / GROWTH / HABITS'],
   health:     ['Health', 'LIFEOS / GROWTH / HEALTH'],
   finance:    ['Finance', 'LIFEOS / MONEY / FINANCE'],
@@ -242,7 +242,7 @@ function render(){
   const c = document.getElementById('pageContent');
    const renderers = {
     dashboard: renderDashboard, profile: renderProfile, academics: renderAcademics,
-    career: renderCareer, ifoa: renderIfoa, habits: renderHabits, health: renderHealth, finance: renderFinance,
+    career: renderCareer, CPA: renderCPA, habits: renderHabits, health: renderHealth, finance: renderFinance,
     investments: renderInvestments, loans: renderLoans, fi: renderFI, goals: renderGoals,
     future: renderFuture, visionboard: renderVisionBoard, documents: renderDocuments, review: renderReview
   };
@@ -748,18 +748,18 @@ function renderCareer(){
   </div>`;
 }
 /* ==========================================================================
-   IFOA EXAM TRACKER
+   CPA EXAM TRACKER
    ========================================================================== */
-function ifoaStatusChip(status){
+function CPAStatusChip(status){
   const map = { 'Not Started':'rose', 'Studying':'blue', 'Registered':'navy', 'Waiting for Results':'amber', 'Passed':'emerald', 'Failed':'rose', 'Exempted':'gold' };
   return map[status] || 'navy';
 }
-function renderIfoa(){
-  const exams = state.ifoaExams||[];
-  const s = ifoaSummary();
+function renderCPA(){
+  const exams = state.CPAExams||[];
+  const s = CPASummary();
   return `
   <div class="module-hero theme-career">
-    <div><h2><i class="fa-solid fa-scroll hero-icon" style="margin-right:10px;"></i>IFoA Exams</h2>
+    <div><h2><i class="fa-solid fa-scroll hero-icon" style="margin-right:10px;"></i>CPA Exams</h2>
     <p>Every paper you're sitting status, exam diet, and fees, from Not Started to Pass or Fail.</p></div>
   </div>
 
@@ -772,7 +772,7 @@ function renderIfoa(){
 
   <div class="glass card">
     <div class="card-title"><i class="fa-solid fa-list"></i>Tracked Exams
-      <button class="icon-btn" style="margin-left:auto; width:28px; height:28px;" id="addIfoaBtn"><i class="fa-solid fa-plus" style="font-size:11px;"></i></button>
+      <button class="icon-btn" style="margin-left:auto; width:28px; height:28px;" id="addCPABtn"><i class="fa-solid fa-plus" style="font-size:11px;"></i></button>
     </div>
     <div style="margin-top:10px;">
       ${exams.length ? exams.map(e=>`
@@ -788,12 +788,12 @@ function renderIfoa(){
             ${e.notes? `<div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">${escapeHtml(e.notes)}</div>`:''}
           </div>
           <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
-            <select data-ifoa-status="${e.id}" style="padding:7px 10px; border-radius:10px; border:1px solid var(--border); background:var(--bg-soft); color:var(--text-primary); font-size:12.5px;">
-              ${IFOA_STATUSES.map(st=>`<option value="${st}" ${e.status===st?'selected':''}>${st}</option>`).join('')}
+            <select data-CPA-status="${e.id}" style="padding:7px 10px; border-radius:10px; border:1px solid var(--border); background:var(--bg-soft); color:var(--text-primary); font-size:12.5px;">
+              ${CPA_STATUSES.map(st=>`<option value="${st}" ${e.status===st?'selected':''}>${st}</option>`).join('')}
             </select>
-            <button class="icon-btn" data-del-ifoa="${e.id}" style="width:30px;height:30px;"><i class="fa-solid fa-trash" style="font-size:11px;"></i></button>
+            <button class="icon-btn" data-del-CPA="${e.id}" style="width:30px;height:30px;"><i class="fa-solid fa-trash" style="font-size:11px;"></i></button>
           </div>
-        </div>`).join('') : emptyState('fa-scroll','No IFoA exams tracked yet. Add CS1, CS2, or whichever paper you\'re on.')}
+        </div>`).join('') : emptyState('fa-scroll','No CPA exams tracked yet. Add CS1, CS2, or whichever paper you\'re on.')}
     </div>
   </div>`;
 }
@@ -1288,16 +1288,16 @@ function wirePageEvents(page){
     document.querySelectorAll('[data-del-app]').forEach(b=> b.onclick = ()=> confirmDelete('Application', ()=>{ removeItem('career.applications', b.dataset.delApp); render(); }));
     document.querySelectorAll('[data-del-interview]').forEach(b=> b.onclick = ()=> confirmDelete('Interview', ()=>{ removeItem('career.interviews', b.dataset.delInterview); render(); }));
   }
-    if(page==='ifoa'){
-    document.getElementById('addIfoaBtn').onclick = openAddIfoaModal;
-    document.querySelectorAll('[data-ifoa-status]').forEach(sel=> sel.onchange = ()=>{
-      const exam = (state.ifoaExams||[]).find(x=>x.id===sel.dataset.ifoaStatus);
+    if(page==='CPA'){
+    document.getElementById('addCPABtn').onclick = openAddCPAModal;
+    document.querySelectorAll('[data-CPA-status]').forEach(sel=> sel.onchange = ()=>{
+      const exam = (state.CPAExams||[]).find(x=>x.id===sel.dataset.CPAStatus);
       exam.status = sel.value;
       if(sel.value==='Passed'){ state.profile.xp = (state.profile.xp||0)+100; }
       save(); render();
       toast(sel.value==='Passed' ? 'Congratulations — marked as Passed!' : 'Status updated.', sel.value==='Passed'?'success':'info');
     });
-    document.querySelectorAll('[data-del-ifoa]').forEach(b=> b.onclick = ()=> confirmDelete('Exam', ()=>{ removeItem('ifoaExams', b.dataset.delIfoa); render(); }));
+    document.querySelectorAll('[data-del-CPA]').forEach(b=> b.onclick = ()=> confirmDelete('Exam', ()=>{ removeItem('CPAExams', b.dataset.delCPA); render(); }));
   }
 
   if(page==='habits'){
@@ -1616,25 +1616,25 @@ function openAddPlanModal(){
     closeModal(); render(); toast('Plan added.','success');
   };
 }
-function openAddIfoaModal(){
-  const catalogOpts = IFOA_CATALOG.map(m=>`<option value="${m.code}|${m.name}">${m.code} — ${m.name}</option>`).join('');
-  openModal('Add IFoA Exam', `
+function openAddCPAModal(){
+  const catalogOpts = CPA_CATALOG.map(m=>`<option value="${m.code}|${m.name}">${m.code} — ${m.name}</option>`).join('');
+  openModal('Add CPA Exam', `
     <div class="field"><label>Pick from catalog (optional)</label>
-      <select id="mIfoaCatalog">
+      <select id="mCPACatalog">
         <option value="">— choose a paper —</option>
         ${catalogOpts}
       </select>
     </div>
-    <div class="field"><label>Code</label><input type="text" id="mCode" placeholder="e.g. CS1"></div>
-    <div class="field"><label>Name</label><input type="text" id="mExamName" placeholder="e.g. Actuarial Statistics 1"></div>
+    <div class="field"><label>Code</label><input type="text" id="mCode" placeholder="e.g. CPA Level"></div>
+    <div class="field"><label>Name</label><input type="text" id="mExamName" placeholder="e.g. Financial Accounting"></div>
     <div class="field"><label>Exam diet</label><input type="text" id="mDiet" placeholder="e.g. April 2026"></div>
     <div class="field"><label>Fee (KES)</label><input type="number" id="mFee" value="0"></div>
-    <div class="field"><label>Status</label><select id="mIfoaStatus">${IFOA_STATUSES.map(st=>`<option>${st}</option>`).join('')}</select></div>
+    <div class="field"><label>Status</label><select id="mCPAStatus">${CPA_STATUSES.map(st=>`<option>${st}</option>`).join('')}</select></div>
     <div class="field"><label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" id="mFeePaid" style="width:auto;"> Fee paid</label></div>
-    <div class="field"><label>Notes</label><textarea id="mIfoaNotes"></textarea></div>
+    <div class="field"><label>Notes</label><textarea id="mCPANotes"></textarea></div>
   `, `<button class="btn btn-ghost btn-block" id="mCancel">Cancel</button><button class="btn btn-primary btn-block" id="mSave">Add</button>`);
 
-  document.getElementById('mIfoaCatalog').onchange = e=>{
+  document.getElementById('mCPACatalog').onchange = e=>{
     if(!e.target.value) return;
     const [code,name] = e.target.value.split('|');
     document.getElementById('mCode').value = code;
@@ -1643,10 +1643,10 @@ function openAddIfoaModal(){
   document.getElementById('mCancel').onclick = closeModal;
   document.getElementById('mSave').onclick = ()=>{
     if(!val('mCode') || !val('mExamName')) return toast('Code and name are required.','warn');
-    addItem('ifoaExams', {
+    addItem('CPAExams', {
       code: val('mCode'), name: val('mExamName'), examDiet: val('mDiet'),
-      fee: num('mFee'), status: val('mIfoaStatus'),
-      feePaid: document.getElementById('mFeePaid').checked, notes: val('mIfoaNotes')
+      fee: num('mFee'), status: val('mCPAStatus'),
+      feePaid: document.getElementById('mFeePaid').checked, notes: val('mCPANotes')
     });
     closeModal(); render(); toast('Exam added.','success');
   };
