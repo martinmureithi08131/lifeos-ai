@@ -1052,12 +1052,14 @@ function renderGoals(){
       <button class="icon-btn" style="margin-left:auto; width:28px; height:28px;" id="addTodoBtn"><i class="fa-solid fa-plus" style="font-size:11px;"></i></button>
     </div>
     <div style="margin-top:14px; display:flex; flex-direction:column; gap:18px;">
-      ${TODO_TIMEFRAMES.map(tf=>{
-        const stats = todoStats(tf);
+            ${TODO_BUCKETS.map(bucket=>{
+        const stats = todoStats(bucket);
+        if(stats.total===0 && bucket==='Later') return ''; // hide empty catch-all bucket
+        const isOverdue = bucket==='Overdue';
         return `
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="font-size:12.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em;">${tf}</span>
+            <span style="font-size:12.5px; font-weight:700; color:${isOverdue?'var(--danger)':'var(--text-secondary)'}; text-transform:uppercase; letter-spacing:.04em;">${bucket}</span>
             <span class="mono" style="font-size:11.5px; color:var(--text-tertiary);">${stats.done}/${stats.total} done</span>
           </div>
           ${stats.items.length ? stats.items.map(t=>`
@@ -1065,6 +1067,7 @@ function renderGoals(){
               <label style="display:flex; align-items:center; gap:10px; flex:1; cursor:pointer;">
                 <input type="checkbox" data-toggle-todo="${t.id}" ${t.done?'checked':''} style="width:16px; height:16px;">
                 <span style="font-size:13.5px; ${t.done?'text-decoration:line-through; color:var(--text-tertiary);':''}">${escapeHtml(t.title)}</span>
+                ${t.dueDate? `<span style="font-size:11px; color:var(--text-tertiary); margin-left:auto;">${escapeHtml(t.dueDate)}</span>`:''}
               </label>
               <button class="icon-btn" data-del-todo="${t.id}" style="width:28px;height:28px;"><i class="fa-solid fa-trash" style="font-size:10px;"></i></button>
             </div>`).join('') : `<div style="font-size:12.5px; color:var(--text-tertiary); padding:6px 0;">Nothing here yet.</div>`}
