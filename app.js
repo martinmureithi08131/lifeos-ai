@@ -1,10 +1,7 @@
 
 let currentPage = 'dashboard';
 let quoteIdx = Math.floor(Math.random()*QUOTES.length);
-
-
 window.addEventListener('DOMContentLoaded', boot);
-
 async function boot(){
   applyTheme();
   wireAuthForms();
@@ -12,9 +9,7 @@ async function boot(){
   setTimeout(async ()=>{
     document.getElementById('loaderScreen').style.opacity = '0';
     document.getElementById('loaderScreen').style.visibility = 'hidden';
-
-
-    if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
+   if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
       await sbSignOut();
       window.__sbUserId = null;
     }
@@ -33,8 +28,7 @@ async function boot(){
 
     if(isRecovery){
       showAuth('reset');
-      return; // don't sign out / don't show login yet — Supabase already
-              // created a temporary session from the recovery token
+      return; 
     }
 
     if(typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED){
