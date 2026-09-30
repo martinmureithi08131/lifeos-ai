@@ -211,7 +211,8 @@ const PAGE_META = {
   fi:         ['Financial Independence', 'LIFEOS / MONEY / FI TRACKER'],
     goals:      ['Goals & To-Dos', 'LIFEOS / VISION / GOALS & TO-DOS'],
   future:     ['Future Plans', 'LIFEOS / VISION / FUTURE PLANS'],
-  visionboard:['Vision Board', 'LIFEOS / VISION / BOARD'],
+   visionboard:['Vision Board', 'LIFEOS / VISION / BOARD'],
+  notes:      ['Notes', 'LIFEOS / VISION / NOTES'],
   documents:  ['Documents', 'LIFEOS / VISION / DOCUMENTS'],
   review:     ['Weekly Review', 'LIFEOS / VISION / WEEKLY REVIEW'],
 };
@@ -238,7 +239,7 @@ function render(){
     dashboard: renderDashboard, profile: renderProfile, academics: renderAcademics,
     career: renderCareer, CPA: renderCPA, habits: renderHabits, health: renderHealth, finance: renderFinance,
     investments: renderInvestments, loans: renderLoans, fi: renderFI, goals: renderGoals,
-    future: renderFuture, visionboard: renderVisionBoard, documents: renderDocuments, review: renderReview
+       future: renderFuture, visionboard: renderVisionBoard, notes: renderNotes, documents: renderDocuments, review: renderReview
   };
   c.innerHTML = `<div class="page">${renderers[currentPage]()}</div>`;
   wirePageEvents(currentPage);
@@ -1191,6 +1192,45 @@ function renderVisionBoard(){
   ${!vb.length ? emptyState('fa-image','Your vision board is empty. Add images that represent your goals.') : ''}
   `;
 }
+/* ==========================================================================
+   NOTES
+   ========================================================================== */
+function noteTimestampLabel(note){
+  const created = new Date(note.createdAt);
+  const createdStr = created.toLocaleString(undefined, { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+  if(note.updatedAt && note.updatedAt !== note.createdAt){
+    const updated = new Date(note.updatedAt);
+    const updatedStr = updated.toLocaleString(undefined, { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+    return `Written ${createdStr} · Edited ${updatedStr}`;
+  }
+  return `Written ${createdStr}`;
+}
+
+function renderNotes(){
+  const notes = (state.notes||[]).slice().sort((a,b)=> new Date(b.updatedAt||b.createdAt) - new Date(a.updatedAt||a.createdAt));
+  return `
+  <div class="module-hero theme-future">
+    <div><h2><i class="fa-solid fa-note-sticky hero-icon" style="margin-right:10px;"></i>Notes</h2>
+    <p>Quick thoughts, reminders, and things worth writing down.</p></div>
+    <button class="btn btn-primary" id="addNoteBtn"><i class="fa-solid fa-plus"></i>New Note</button>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:14px;">
+    ${notes.length ? notes.map(n=>`
+      <div class="glass card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:700; font-size:15px;">${escapeHtml(n.title || 'Untitled')}</div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:3px;">${noteTimestampLabel(n)}</div>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button class="icon-btn" data-edit-note="${n.id}" style="width:30px;height:30px;"><i class="fa-solid fa-pen" style="font-size:11px;"></i></button>
+            <button class="icon-btn" data-del-note="${n.id}" style="width:30px;height:30px;"><i class="fa-solid fa-trash" style="font-size:11px;"></i></button>
+          </div>
+        </div>
+        <p style="margin-top:10px; font-size:13.5px; color:var(--text-secondary); white-space:pre-wrap; line-height:1.6;">${escapeHtml(n.content)}</p>
+      </div>`).join('') : emptyState('fa-note-sticky','No notes yet — jot something down.')}
+  </div>`;
+}
 
 /* ==========================================================================
    DOCUMENTS
@@ -1394,6 +1434,11 @@ function wirePageEvents(page){
       if(item && item.path && typeof SUPABASE_ENABLED !== 'undefined' && SUPABASE_ENABLED) sbDeleteFile(item.path);
       removeItem('visionBoard', b.dataset.delVision); render();
     });
+  }
+    if(page==='notes'){
+    document.getElementById('addNoteBtn').onclick = ()=>openNoteModal();
+    document.querySelectorAll('[data-edit-note]').forEach(b=> b.onclick = ()=>openNoteModal(b.dataset.editNote));
+    document.querySelectorAll('[data-del-note]').forEach(b=> b.onclick = ()=> confirmDelete('Note', ()=>{ removeItem('notes', b.dataset.delNote); render(); }));
   }
 
   if(page==='documents'){
@@ -1646,5 +1691,27 @@ function openAddCPAModal(){
       feePaid: document.getElementById('mFeePaid').checked, notes: val('mCPANotes')
     });
     closeModal(); render(); toast('Exam added.','success');
+  };
+}
+function openNoteModal(noteId){
+  const existing = noteId ? (state.notes||[]).find(n=>n.id===noteId) : null;
+  openModal(existing ? 'Edit Note' : 'New Note', `
+    <div class="field"><label>Title</label><input type="text" id="mNoteTitle" value="${existing?escapeHtml(existing.title):''}" placeholder="e.g. Move-in checklist"></div>
+    <div class="field"><label>Note</label><textarea id="mNoteContent" style="min-height:140px;">${existing?escapeHtml(existing.content):''}</textarea></div>
+  `, `<button class="btn btn-ghost btn-block" id="mCancel">Cancel</button><button class="btn btn-primary btn-block" id="mSave">${existing?'Save':'Add'}</button>`);
+
+  document.getElementById('mCancel').onclick = closeModal;
+  document.getElementById('mSave').onclick = ()=>{
+    if(!val('mNoteContent').trim()) return toast('Note content required.','warn');
+    const now = new Date().toISOString();
+    if(existing){
+      existing.title = val('mNoteTitle');
+      existing.content = val('mNoteContent');
+      existing.updatedAt = now;
+      save(); closeModal(); render(); toast('Note updated.','success');
+    } else {
+      addItem('notes', { title: val('mNoteTitle'), content: val('mNoteContent'), createdAt: now, updatedAt: now });
+      closeModal(); render(); toast('Note added.','success');
+    }
   };
 }
